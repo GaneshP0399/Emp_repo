@@ -1,0 +1,32 @@
+/* You can add global styles to this file, and also import other style files */
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+
+.card-title,
+.card-text,
+.table th,
+.table td {
+    font-family: 'Poppins', sans-serif;
+}
+
+* {
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+.bg-light-blue {
+       background-color: #f4f7fb;
+}
+
+
+.card-title {
+    font-weight: 600;
+}
+
+.card-text {
+    font-weight: 400;
+}

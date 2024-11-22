@@ -1,0 +1,138 @@
+<div class="bg-light-blue p-4">
+    <div class="container ">
+        <div class="row mb-4">
+            <div class="col-lg-6 mx-auto">
+                <div class="card shadow-lg rounded-3shadow-sm p-4">
+                    <h5 class="card-title mb-3">Employee Details</h5>
+                    <div class="d-flex align-items-center">
+                        <img [src]="userDetails.image || '../../assets/profile/profile.png'"
+                            class="img-fluid rounded-circle empImg" alt="Profile Image"
+                             />
+                        <div class="ms-4">
+                            <h6>{{ userDetails.f_name }} {{ userDetails.l_name || '' }}</h6>
+                            <p><strong>Employee ID:</strong> {{ userDetails.emp_id }}</p>
+                            <p><strong>Phone:</strong> {{ userDetails.phone }}</p>
+                            <p><strong>Email:</strong> {{ userDetails.email || 'Not Provided' }}</p>
+                            <p><strong>Status:</strong> {{ userDetails.status === 1 ? 'Active' : 'Inactive' }}</p>
+                            <p><strong>Order Count:</strong> {{ userDetails.order_count }}</p>
+                            <p><strong>Meal Options:</strong>
+                                Breakfast: {{ userDetails.is_breakfast ? 'Yes' : 'No' }},
+                                Lunch: {{ userDetails.is_lunch ? 'Yes' : 'No' }},
+                                Dinner: {{ userDetails.is_dinner ? 'Yes' : 'No' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mx-auto">
+                <div class="card shadow-lg rounded-3shadow-sm p-4  mb-4">
+                    <h5 class="card-title mb-3">Select Month</h5>
+                    <label for="bdaymonth" class="form-label">Month:</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="month" id="bdaymonth" [(ngModel)]="month" name="bdaymonth" class="form-control">
+                        <button type="button" class="btn btn-primary d-flex" (click)="searchDate()"
+                            [disabled]="loader">Search
+                            <div class="spinner-border text-white spinner-border-sm mt-1" role="status" *ngIf="loader">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                <div class="card shadow-lg rounded-3shadow-sm p-4 ">
+                    <div class="row">
+                        <h5 class="card-title mb-3">Select Day</h5>
+                        <div class="col-md-5">
+                            <label for="startDate" class="form-label">Start Date:</label>
+                            <input type="date" id="startDate" class="form-control" [(ngModel)]="startDate"
+                                placeholder="Select start date" />
+                        </div>
+                        <div class="col-md-5">
+                            <label for="endDate" class="form-label">End Date:</label>
+                            <input type="date" id="endDate" class="form-control" [(ngModel)]="endDate"
+                                placeholder="Select end date" />
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" (click)="filterData()"
+                                [disabled]="!startDate || !endDate">
+                                Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-6" *ngIf="reportdata_v1">
+                <div class="card shadow-lg rounded-3shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Status Summary</h5>
+                        <canvas *ngIf="chartData" baseChart [data]="chartData" [options]="chartOptions" chartType="bar"
+                            class="mb-1">
+                        </canvas>
+                        <div>
+                            <h6>Meal Summary</h6>
+                            <table class="table table-bordered ">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Meal</th>
+                                        <th>Delivered</th>
+                                        <th>Canceled</th>
+                                        <th>Pending</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let meal of categorys">
+                                        <td>{{ meal }}</td>
+                                        <td>{{ summary[meal]?.Delivered || 0 }}</td>
+                                        <td>{{ summary[meal]?.Canceled || 0 }}</td>
+                                        <td>{{ summary[meal]?.Pending || 0 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" *ngIf="reportdata_v1">
+                <div class="card shadow-lg rounded-3shadow-sm">
+                    <div class="card-body">
+                        <strong class="fs-4 fw-bold card-text">Monthly Total Fine:</strong>
+                        <p> <span class="fs-2 fw-bold">{{ totalFine | currency:'INR' }}</span></p>
+                        <h5 class="card-title">Employee Food Order Report</h5>
+                        <p-table [value]="reportdata_v1" [responsive]="true" [paginator]="true" [rows]="5"  class="mt-3">
+                            <ng-template pTemplate="header" class="bg-light-blue">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Breakfast</th>
+                                    <th>Lunch</th>
+                                    <th>Dinner</th>
+                                    <th>Fine</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-report>
+                                <tr>
+                                    <td>{{ report.date | date: 'shortDate' }}</td>
+                                    <td>{{ report.opt_ins.breakfast || 'No Data' }}</td>
+                                    <td>{{ report.opt_ins.lunch || 'No Data' }}</td>
+                                    <td>{{ report.opt_ins.dinner || 'No Data' }}</td>
+                                    <td>
+                                        <span
+                                            *ngIf="report.opt_ins.breakfast === 'Pending' || report.opt_ins.lunch === 'Pending' || report.opt_ins.dinner === 'Pending'">
+                                            ₹100
+                                        </span>
+                                        <span
+                                            *ngIf="!(report.opt_ins.breakfast === 'Pending' || report.opt_ins.lunch === 'Pending' || report.opt_ins.dinner === 'Pending')">
+                                            ₹0
+                                        </span>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
